@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=shiro
+Type=X-GNOME-Metatheme
+Comment=
+
+[X-GNOME-Metatheme]
+GtkTheme=Materia-dark
+MetacityTheme=Materia-dark
+IconTheme=Papirus-Dark
+GtkColorScheme=link_color:#8AB4F8,visited_link_color:#CE93D8
+CursorTheme=Adwaita
+CursorSize=24
