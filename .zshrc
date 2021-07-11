@@ -5,6 +5,10 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 	. "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+if [ "$TERM" = "linux" ]; then
+	export TERM=linux-16color
+fi
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -79,7 +83,6 @@ plugins=(fzf zsh-interactive-cd catimg)
 
 # User configuration
 
-setopt APPEND_HISTORY
 for file (~/.config/zsh/*.zsh); do
 	. $file
 done
