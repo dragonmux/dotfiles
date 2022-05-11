@@ -1,6 +1,6 @@
 [user]
-	name = dx-mon
-	email = dx-mon@users.sourceforge.net
+	name = dragonmux
+	email = git@dragonmux.network
 	signingKey = 0137BA904EBDB4CD
 [push]
 	default = current
@@ -13,6 +13,7 @@
 	required = true
 [pull]
 	rebase = true
+	autostash = true
 [rebase]
 	autostash = true
 [init]
