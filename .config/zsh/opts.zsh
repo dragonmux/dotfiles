@@ -1,2 +1,4 @@
+unsetopt autocd
+unsetopt autopushd
 unsetopt share_history
 setopt inc_append_history
