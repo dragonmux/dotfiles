@@ -17,8 +17,9 @@
 [rebase]
 	autostash = true
 [init]
-	templateDir = ~/.config/git/template
 	defaultBranch = main
 [url "git@github.com:"]
-  pushInsteadOf = git://github.com/
-  pushInsteadOf = https://github.com/
+	pushInsteadOf = git://github.com/
+	pushInsteadOf = https://github.com/
+[diff]
+	algorithm = histogram
