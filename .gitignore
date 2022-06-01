@@ -2,3 +2,4 @@
 /steam-*.log
 /.yarnrc
 /.Xauthority
+/.cache
