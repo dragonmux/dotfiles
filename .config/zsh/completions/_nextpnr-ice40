@@ -1,0 +1,179 @@
+#compdef nextpnr-ice40 yowasp-nextpnr-ice40
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Copyright (c) 2022 Rachel Mant
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+local arguments context state state_descr line
+typeset -A opt_args
+
+arguments=(
+	'(-h --help)'{-h,--help}'[show help]'
+	'(-V --verion)'{-V,-version}'[show version]'
+	'(-v --verbose)'{-v,--verbose}'[verbose output]'
+	'(-q --quiet)'{-q,--quiet}'[quiet mode, only errors and warnings are displayed]'
+	'(-l --log)'{-l,--log=}'[log all messages to a file, regardless of quiet mode]:file:_files'
+	'--debug[debug output]'
+	'--debug-placer[debug output from the placer only]'
+	'--debug-router[debug output from the router only]'
+	'--threads=[number of threads for passes where this is configurable]:number'
+	'(-f --force)'{-f,--force}'[keep running after errors]'
+	'--gui[start the GUI]'
+
+	'--run=[python file to execute instead of the default flow]:file:_files -g "*.py"'
+	'--pre-pack=[python file to run before packing]:file:_files -g "*.py"'
+	'--pre-place=[python file to run before placement]:file:_files -g "*.py"'
+	'--pre-route=[python file to run before routing]:file:_files -g "*.py"'
+	'--post-route=[python file to run after routing]:file:_files -g "*.py"'
+	'--on-failure=[python file to run in the event of a crash for design introspection]:file:_files -g "*.py"'
+
+	'--json=[JSON design file to ingest]:file:_files -g "*.json"'
+	'--write=[JSON design file to write]:file:_files -g "*.json"'
+	'--top=[name of the module to use as the top module]:module'
+	'(--seed -r --randomize-seed)--seed=[seed value for the random number generator]:number'
+	'(--seed -r --randomize-seed)'{-r,--randomize-seed}'[randomize the seed vaue for the random number generator]'
+	'--placer=[placer algorithm to use; default: heap]:placer:(sa heap)'
+	'--router=[router algorithm to use; default: router1]:router:(router1 router2)'
+	'--slack_redist_iter=[number of iterations between slack redistribution]:number'
+	'--pack-only[pack design only without placement or routing]'
+	'--no-route[process design without routing]'
+	'--no-place[process design without placement]'
+	'--no-pack[process design without packing]'
+	'--ignore-loops[ignore combinatorial loops in timing analysis]'
+	'--test[check architecture database integrity]'
+	'--freq=[set target frequency for design in MHz]:decimal number'
+	'--timing-allow-fail[allow timing to fail in design]'
+	'--no-tmdriv[disable timing-driven placement]'
+	'--sdf=[file to write SDF delay back-annotations to]:file:_files'
+	'--sdf-cvc[enable tweaks for SDF file compatability with the CVC simulator]'
+	'--no-print-critical-path-source[disable printing of the line numbers associated with each net in the critical path]'
+	'--parallel-refine[use the new and experimental parallelised engine for placement refinement]'
+	'(--tmg-ripup --router2-tmg-ripup)--tmg-ripup[enable experimental timing-driven ripup in the router]'
+	'--report=[write timing and utilization report in JSON format to file]:file:_files -g "*.json"'
+	'--placed-svg=[writer render of placement to SVG file]:file:_files -g "*.svg"'
+	'--routed-svg=[writer render of routing to SVG file]:file:_files -g "*.svg"'
+	'--pcf=[PCF constraints file to ingest]:file:_files -g "*.pcf"'
+	'(--asc --read)--asc=[ASC bitstream file to write]:file:_files -g "*.asc"'
+	'(--asc --read)--read=[ASC bitstream file to read]:file:_files -g "*.asc"'
+	'(--promote-logic --no-promote-globals)--promote-logic[enable promotion of logic to globals (in addition to clk/ce/sr by default]'
+	'(--promote-logic --no-promote-globals)--no-promote-globals[disable all global promotion]'
+	'--opt-timing[run post-placement timing optimisation pass (experimental)]'
+	'--tmfuzz[run path delay estimate fuzzer]'
+	'--pcf-allow-unconstrained[don''t require PCF to constrain all IO]'
+)
+
+if ! (( $words[(Ie)--placer=heap] )); then
+	arguments+=(
+		'--cstrweight=[placer weighting for relative constraint satisfaction]:decimal number'
+		'--starttemp=[SA placer start temperature]:decimal number'
+		'--placer-budgets[use budget rather than criticality in placer timing weights]'
+	)
+else
+	arguments+=(
+		'--placer-heap-alpha=[placer "heap" alpha value (float, default: 0.1)]:float number'
+		'--placer-heap-beta=[placer "heap" beta value (float, default: 0.9)]:float number'
+		'--placer-heap-critexp=[placer "heap" criticality component (int, default: 2)]:number'
+		'--placer-heap-timingweight=[placer "heap" timing weight (int, default: 10)]:number'
+	)
+fi
+
+if (( $words[(Ie)--router=router2] )); then
+	arguments+=(
+		'--router2-heatmap=[prefix for router2 resource congestion heatmaps]:directory:_directories'
+		'(--tmg-ripup --router2-tmg-ripup)--router2-tmg-ripup[enable experimental timing-driven ripup in the router (deprecaed in favour of --tmg-ripup)]'
+	)
+fi
+
+if (( $words[(Ie)--gui] )); then
+	arguments+=('--gui-no-aa[disable anti-aliasing in the GUI]')
+fi
+
+if (( $words[(Ie)--report] )); then
+	arguments+=('--detailed-timing-report[append detailed net timing data to the JSON report]')
+fi
+
+local devices packages ice384 ice1k iceu4k ice4k ice5k ice8k
+typeset -A devices packages
+
+devices=(
+	'--lp384' '[set device type to iCE40LP384]'
+	'--lp1k' '[set device type to iCE40LP1K]'
+	'--lp4k' '[set device type to iCE40LP4K]'
+	'--lp8k' '[set device type to iCE40LP8K]'
+	'--hx1k' '[set device type to iCE40HX1K]'
+	'--hx4k' '[set device type to iCE40HX4K]'
+	'--hx8k' '[set device type to iCE40HX8K]'
+	'--up3k' '[set device type to iCE40UP3K]'
+	'--up5k' '[set device type to iCE40UP5K]'
+	'--u1k' '[set device type to iCE40U1K]'
+	'--u2k' '[set device type to iCE40U2K]'
+	'--u4k' '[set device type to iCE40U4K]'
+)
+
+ice384=('cm36' 'cm49' 'qn32')
+ice1k=('cb121' 'cb132' 'cb81' 'cm121' 'cm36' 'cm49' 'cm81' 'qn84' 'swg16tr' 'tq144' 'vq100')
+iceu4k=('sg48')
+ice4k=('bg121' 'cb132' 'cm121' 'cm255' 'cm81' 'tq144')
+ice5k=('sg48' 'uwg30')
+ice8k=('bg121' 'cb132' 'cm121' 'cm225' 'cm81' 'ct256')
+
+packages=(
+	'--lp384' ice384
+	'--lp1k' ice1k
+	'--lp4k' ice4k
+	'--lp8k' ice8k
+	'--hx1k' ice1k
+	'--hx4k' ice4k
+	'--hx8k' ice8k
+	'--up3k' ice5k
+	'--up5k' ice5k
+	'--u1k' u4k
+	'--u2k' u4k
+	'--u4k' u4k
+)
+
+local haveDevice=0 device package desc deviceTag=''
+
+for device in ${(k)devices}; do
+	if (( $words[(Ie)$device] )); then
+		haveDevice=$words[(Ie)$device]
+	fi
+	deviceTag="$deviceTag $device"
+done
+
+for device desc in ${(kv)devices}; do
+	arguments+=("(${deviceTag/ /})$device$desc")
+done
+
+if (( $haveDevice )); then
+	_message "Available packages for $words[$haveDevice]: $packages[$words[$haveDevice]]"
+	package=$packages[$words[$haveDevice]]
+	arguments+=("--package=[set device package]:package:(${(P)package})")
+fi
+
+_arguments -s : $arguments
