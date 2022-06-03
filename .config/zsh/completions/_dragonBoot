@@ -31,46 +31,54 @@
 
 _dragonBoot_build() {
 	local arguments targets
-	local usage=`$lines[0] build -h | grep usage:`
+	local usage=`$cmd build -h | grep usage:`
 	targets=$usage[$usage[(Ie)--target]+10,-2]
 
-	arguments=("--target=[target device that you wish to build the bootloader for]:target:(${(s/,/)targets})")
+	arguments=(
+		'(-h --help)'{-h,--help}'[show help message and exit]'
+		"--target=[target device that you wish to build the bootloader for]:target:(${(s/,/)targets})"
+	)
 	_arguments -s : $arguments
 }
 
 _dragonBoot_command() {
-	local -a commands expl
-
-	commands=(
-		'arachne-sim' 'run the dragonBoot simulation suite'
-		'arachne-formal' 'run the dragonBoot formal verification suite'
-		'build' 'build dragonBoot'
+	local -a commands=(
+		'arachne-sim[run the dragonBoot simulation suite]'
+		'arachne-formal[run the dragonBoot formal verification suite]'
+		'build[build dragonBoot]'
 	)
-	_description '' expl ''
-	comadd "$expl[@]" -O allmatching -a commands
+	_values 'dragonBoot commands' : $commands
 }
 
-local arguments context state state_descr line
-integer ret=1
+_dragonBoot() {
+	local arguments context curcontext=$curcontext state state_descr line
+	integer ret=1
 
-arguments=(
-	'(-h --help)'{-h,--help}'[show help]'
-	'(--verbose --debug --quiet)--verbose[verbose mode]'
-	'(--verbose --debug --quiet)--debug[debug mode]'
-	'(--verbose --debug --quiet)--quiet[quiet mode]'
-	'--disable-color[disable output colouring]'
-	'(-): :->command'
-)
+	arguments=(
+		'(-h --help)'{-h,--help}'[show help message and exit]'
+		'(--verbose --debug --quiet)--verbose[verbose mode]'
+		'(--verbose --debug --quiet)--debug[debug mode]'
+		'(--verbose --debug --quiet)--quiet[quiet mode]'
+		'--disable-color[disable output colouring]'
+		'(-): :->command'
+		'(-)*:: :->arguments'
+	)
 
-_arguments -s : $arguments && return
+	_arguments -s -C : $arguments && return
 
-case $state in
-	(command)
-		_dragonBoot_command && ret=0
-		;;
-	(build)
-		_dragonBoot_build && ret=0
-		;;
-esac
+	case $state in
+		(command)
+			_dragonBoot_command && ret=0
+			;;
+		(arguments)
+			if [ $words[1] = 'build' ]; then
+				curcontext=${curcontext%:*:*}:dragonBoot-build:
+				_dragonBoot_build && ret=0
+			fi
+			;;
+	esac
 
-return $ret
+	return $ret
+}
+
+_dragonBoot
