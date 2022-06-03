@@ -38,6 +38,18 @@ _dragonBoot_build() {
 	_arguments -s : $arguments
 }
 
+_dragonBoot_command() {
+	local -a commands expl
+
+	commands=(
+		'arachne-sim' 'run the dragonBoot simulation suite'
+		'arachne-formal' 'run the dragonBoot formal verification suite'
+		'build' 'build dragonBoot'
+	)
+	_description '' expl ''
+	comadd "$expl[@]" -O allmatching -a commands
+}
+
 local arguments context state state_descr line
 integer ret=1
 
@@ -47,14 +59,15 @@ arguments=(
 	'(--verbose --debug --quiet)--debug[debug mode]'
 	'(--verbose --debug --quiet)--quiet[quiet mode]'
 	'--disable-color[disable output colouring]'
-	'(build arachne-sim arachne-formal)arachne-sim[run the dragonBoot simulation suite]'
-	'(build arachne-sim arachne-formal)arachne-formal[run the dragonBoot formal verification suite]'
-	'(build arachne-sim arachne-formal)build[build dragonBoot]: :->build'
+	'(-): :->command'
 )
 
 _arguments -s : $arguments && return
 
 case $state in
+	(command)
+		_dragonBoot_command && ret=0
+		;;
 	(build)
 		_dragonBoot_build && ret=0
 		;;
