@@ -44,7 +44,7 @@ arguments=(
 	'-l[list available supported probes]'
 	'-v=[set the output verbosity level]:number'
 	'(-d -P -s -c)-d=[use a serial device at the given path]:path:_files'
-	'(-d -P -s -c)-P=[use the <number>th debug probe found while scanning the system, see the output form list for the order]:number'
+	'(-d -P -s -c)-P=[use the <number>th debug probe found while scanning the system, see the output from list for the order]:number'
 	'(-d -P -s -c)-s=[select the debug probe with the given serial number]:serial'
 	'(-d -P -s -c)-c=[select the FTDI-based debug probe with of the given type]:type'
 	'-n=[select the target device at the given position in the scan chain]:number'
